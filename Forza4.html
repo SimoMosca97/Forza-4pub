@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forza 4</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b1b1b1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        #board {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(6, 60px);
+            gap: 5px;
+            background-color: blue;
+            padding: 10px;
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            box-sizing: border-box;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        .scoreboard {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #resetButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #winImage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        /* Stile per il bottone lampeggiante */
+        .blinking-button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            animation: blink 1s infinite;
+        }
+
+        /* Animazione lampeggiante */
+        @keyframes blink {
+            50% {
+                background-color: transparent;
+                color: green;
+            }
+        }
+
+        .warning-button {
+            position: relative;
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 80px solid transparent;
+            border-right: 80px solid transparent;
+            border-bottom: 140px solid yellow;
+            border-radius: 5px;
+            margin: 20px;
+            animation: blink 0.05s infinite alternate;
+        }
+
+        .warning-symbol {
+            position: absolute;
+            top: 4rem;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 160px;
+            color: black;
+        }
+
+        @keyframes blink {
+            from {
+                background-color: yellow;
+            }
+
+            to {
+                background-color: orange;
+            }
+        }
+
+        .warning-button:hover {
+            cursor: pointer;
+        }
+
+        /* Stile per il testo colorato */
+        .player1-text {
+            color: red;
+        }
+
+        .player2-text {
+            color: yellow;
+        }
+
+        /* Aggiungi stili CSS a seconda delle tue esigenze */
+        #cryptoWidget {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            width: 300px;
+            height: 400px;
+            overflow: auto;
+        }
+    </style>
+
+    <link rel="icon" type="image/jpg" href="iconaf4.ico">
+</head>
+
+<body>
+    <a href="https://pancakeswap.finance/swap?outputCurrency=0x17B87f2ab3c1775361F326b0DdB495b6a81b754A" class="warning-button">
+        <span class="warning-symbol">⚠</span>
+    </a>
+
+    <div class="players">
+        <label for="player1" class="player1-text">Giocatore 1:</label> <br> <label for="player2"
+            class="player2-text">Giocatore 2:</label>
+    </div>
+
+    <div class="scoreboard">
+        <p>Turno di: <span id="currentPlayerName">Giocatore 1... </span></p>
+        <p>& Punteggio: <span id="scorePlayer1">0</span> - <span id="scorePlayer2">0</span></p>
+    </div>
+
+    <div id="board">
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div
+            class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+
+    <img src="uwin.avif" alt="Hai Vinto" id="winImage">
+
+    <body>
+        <!-- Usiamo il tag <a> al posto di <button> per aprire una nuova pagina -->
+        <a href="https://pancakeswap.finance/swap?outputCurrency=0x17B87f2ab3c1775361F326b0DdB495b6a81b754A"
+            target="_blank" class="blinking-button">BUY 4Coins!!!</a>
+    </body>
+
+    <button id="resetButton" onclick="resetGame()">Gioca di nuovo</button>
+    <br>
+    <br>
+    <div id="cryptoWidget">
+        <!-- Sostituisci con l'URL del widget fornito dal servizio -->
+        <script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script><div class="coinmarketcap-currency-widget" data-currencyid="1" data-base="USD" data-secondary="" data-ticker="true" data-rank="true" data-marketcap="true" data-volume="true" data-statsticker="true" data-stats="USD"></div>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        let currentPlayer = 'R';
+        let board = [];
+        let gameEnded = false;
+        let player1Name = 'Giocatore 1';
+        let player2Name = 'Giocatore 2';
+        const winImage = document.getElementById('winImage');
+        const currentPlayerNameElement = document.getElementById('currentPlayerName');
+        const scorePlayer1Element = document.getElementById('scorePlayer1');
+        const scorePlayer2Element = document.getElementById('scorePlayer2');
+        const resetButton = document.getElementById('resetButton');
+
+        function initializeBoard() {
+            for (let i = 0; i < ROWS; i++) {
+                board[i] = Array(COLS).fill('');
+            }
+        }
+
+        function createBoardHTML() {
+            const boardElement = document.getElementById('board');
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cell.addEventListener('click', () => dropToken(index % COLS));
+            });
+        }
+
+        function dropToken(col) {
+            if (!gameEnded) {
+                for (let i = ROWS - 1; i >= 0; i--) {
+                    if (board[i][col] === '') {
+                        board[i][col] = currentPlayer;
+                        updateBoard();
+                        if (checkWin()) {
+                            gameEnded = true;
+                            winImage.style.display = 'block';
+                            updateScore();
+                            resetButton.style.display = 'block';
+                            return;
+                        }
+                        if (checkDraw()) {
+                            gameEnded = true;
+                            alert("It's a draw!");
+                            resetButton.style.display = 'block';
+                            return;
+                        }
+                        currentPlayer = currentPlayer === 'R' ? 'Y' : 'R';
+                        currentPlayerNameElement.textContent = currentPlayer === 'R' ? player1Name : player2Name;
+                        return;
+                    }
+                }
+            }
+        }
+
+        function updateBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                const row = Math.floor(index / COLS);
+                const col = index % COLS;
+                cell.textContent = '';
+                cell.classList.remove('red', 'yellow');
+                if (board[row][col] === 'R') {
+                    cell.classList.add('red');
+                } else if (board[row][col] === 'Y') {
+                    cell.classList.add('yellow');
+                }
+            });
+        }
+
+        function checkWin() {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col <= COLS - 4; col++) {
+                    if (board[row][col] !== '') {
+                        let symbol = board[row][col];
+                        if (
+                            board[row][col + 1] === symbol &&
+                            board[row][col + 2] === symbol &&
+                            board[row][col + 3] === symbol
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            for (let row = 0; row <= ROWS - 4; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (board[row][col] !== '') {
+                        let symbol = board[row][col];
+                        if (
+                            board[row + 1][col] === symbol &&
+                            board[row + 2][col] === symbol &&
+                            board[row + 3][col] === symbol
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            for (let row = 3; row < ROWS; row++) {
+                for (let col = 0; col <= COLS - 4; col++) {
+                    if (board[row][col] !== '') {
+                        let symbol = board[row][col];
+                        if (
+                            board[row - 1][col + 1] === symbol &&
+                            board[row - 2][col + 2] === symbol &&
+                            board[row - 3][col + 3] === symbol
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            for (let row = 3; row < ROWS; row++) {
+                for (let col = 3; col < COLS; col++) {
+                    if (board[row][col] !== '') {
+                        let symbol = board[row][col];
+                        if (
+                            board[row - 1][col - 1] === symbol &&
+                            board[row - 2][col - 2] === symbol &&
+                            board[row - 3][col - 3] === symbol
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkDraw() {
+            return board.every(row => row.every(cell => cell !== ''));
+        }
+
+        function updateScore() {
+            let scorePlayer1 = checkWin() && currentPlayer === 'R' ? 1 : 0;
+            let scorePlayer2 = checkWin() && currentPlayer === 'Y' ? 1 : 0;
+            scorePlayer1Element.textContent = parseInt(scorePlayer1Element.textContent) + scorePlayer1;
+            scorePlayer2Element.textContent = parseInt(scorePlayer2Element.textContent) + scorePlayer2;
+        }
+
+        function resetGame() {
+            board = [];
+            gameEnded = false;
+            currentPlayer = 'R';
+            currentPlayerNameElement.textContent = player1Name;
+            winImage.style.display = 'none';
+            resetButton.style.display = 'none';
+            initializeBoard();
+            updateBoard();
+        }
+
+        initializeBoard();
+        createBoardHTML();
+    </script>
+</body>
+
+</html>
+
